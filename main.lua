@@ -1,4 +1,4 @@
--- DeepHat x uProxyz Custom Framework [ULTIMATE CLEAN EDITION]
+-- DeepHat x uProxyz Custom Framework [ULTIMATE SPEED & AUTO-SPAWN]
 -- Estética: Cyberpunk / Dark Purple / Neon
 
 local Player = game.Players.LocalPlayer
@@ -13,6 +13,9 @@ local WalkSpeedActive = false
 local InfiniteJumpActive = false
 local ESPActive = false
 local JumpPowerActive = false
+
+-- Variável para salvar o local de nascimento
+local AutoSpawnPos = nil 
 
 -- Configurações de Boost
 local WalkSpeedVal = 100 
@@ -207,13 +210,38 @@ ESPBtn.MouseButton1Click:Connect(function()
     ESPBtn.TextColor3 = ESPActive and ThemeColor or TextColor
 end)
 
+-- [DETECTOR DE SPAWN AUTOMÁTICO]
+-- Esta função roda sempre que você nasce para salvar sua posição
+local function TrackSpawn()
+    local Character = Player.Character or Player.CharacterAdded:Wait()
+    local Root = Character:WaitForChild("HumanoidRootPart", 10)
+    
+    if Root then
+        task.wait(2) -- Espera 2 segundos para garantir que o jogo carregou o mapa
+        AutoSpawnPos = Root.Position + Vector3.new(0, 3, 0) -- Salva sua posição de nascimento
+        print("uProxyz: Spawn detectado e salvo!")
+    end
+end
+
+-- Detecta quando você entra ou renasce
+Player.CharacterAdded:Connect(TrackSpawn)
+if Player.Character then task.spawn(TrackSpawn) end
+
 -- [LOOPS DE SISTEMA]
 
 -- Noclip, WalkSpeed, JumpPower Loop
 RunService.Stepped:Connect(function()
-    if NoclipActive and Player.Character then
-        for _, part in pairs(Player.Character:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = false end
+    if Player.Character then
+        local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
+        if Hum then
+            if WalkSpeedActive then Hum.WalkSpeed = WalkSpeedVal end
+            if JumpPowerActive then Hum.JumpPower = JumpPowerVal end
+        end
+        
+        if NoclipActive then
+            for _, part in pairs(Player.Character:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
         end
     end
 end)
@@ -270,31 +298,30 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- Teleport Base (Blink TP)
+-- [TELEPORTE BASE - SISTEMA DE SPAWN DETECTADO]
 TPBaseBtn.MouseButton1Click:Connect(function()
     local Character = Player.Character
     local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+    
     if Root then
-        local TargetPos
-        local SpawnLoc = workspace:FindFirstChildOfClass("SpawnLocation")
-        if SpawnLoc then TargetPos = SpawnLoc.Position + Vector3.new(0, 5, 0) else TargetPos = Vector3.new(0, 50, 0) end
-        
-        local MaxDistance = 25
-        local Steps = (Root.Position - TargetPos).Magnitude / MaxDistance
-        for i = 1, math.ceil(Steps) do
-            if not Character or not Root then break end
-            local Direction = (TargetPos - Root.Position).Unit
-            Root.CFrame = Root.CFrame + (Direction * MaxDistance)
-            task.wait(0.04)
-            if (Root.Position - TargetPos).Magnitude < MaxDistance then break end
+        if AutoSpawnPos then
+            -- Teleporta para a posição salva do seu nascimento
+            Root.CFrame = CFrame.new(AutoSpawnPos)
+        else
+            -- Fallback se ainda não salvou o spawn
+            local SpawnLoc = workspace:FindFirstChildOfClass("SpawnLocation")
+            if SpawnLoc then
+                Root.CFrame = SpawnLoc.CFrame + Vector3.new(0, 5, 0)
+            else
+                Root.CFrame = CFrame.new(0, 50, 0)
+            end
         end
-        Root.CFrame = CFrame.new(TargetPos)
     end
 end)
 
--- [SELF DESTRUCT - LIMPEZA PROFUNDA]
+-- Self Destruct
 SelfDestructBtn.MouseButton1Click:Connect(function()
-    -- 1. Desativa todas as variáveis para parar os loops
+    -- Limpeza Total
     NoclipActive = false
     FlyActive = false
     WalkSpeedActive = false
@@ -302,32 +329,24 @@ SelfDestructBtn.MouseButton1Click:Connect(function()
     ESPActive = false
     JumpPowerActive = false
     
-    -- 2. Destrói a Interface (GUI)
     ScreenGui:Destroy()
     
-    -- 3. Limpa o Personagem (Remove BodyVelocity, BodyGyro, etc)
     if Player.Character then
         local Root = Player.Character:FindFirstChild("HumanoidRootPart")
         if Root then
             if Root:FindFirstChild("FlyVelocity") then Root.FlyVelocity:Destroy() end
             if Root:FindFirstChild("FlyGyro") then Root.FlyGyro:Destroy() end
         end
-        
         local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
         if Hum then
-            Hum.WalkSpeed = 16 -- Reseta para o padrão
-            Hum.JumpPower = 50 -- Reseta para o padrão
+            Hum.WalkSpeed = 16
+            Hum.JumpPower = 50
         end
     end
     
-    -- 4. Limpa o ESP de todos os outros jogadores
     for _, p in pairs(game.Players:GetPlayers()) do
-        if p.Character then
-            local esp = p.Character:FindFirstChild("uProxyzESP")
-            if esp then esp:Destroy() end
+        if p.Character and p.Character:FindFirstChild("uProxyzESP") then
+            p.Character.uProxyzESP:Destroy()
         end
     end
-    
-    -- 5. Finalização do Script
-    print("uProxyz: [SYSTEM SHUTDOWN] - All traces removed.")
 end)
