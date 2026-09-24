@@ -1,6 +1,5 @@
--- DeepHat x uProxyz Custom Framework [ULTIMATE OVERDRIVE]
+-- DeepHat x uProxyz Custom Framework [ULTIMATE CLEAN EDITION]
 -- Estética: Cyberpunk / Dark Purple / Neon
--- Features: Draggable UI, Fly, Noclip, WalkSpeed, JumpPower, ESP, Infinite Jump
 
 local Player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -13,10 +12,13 @@ local FlyActive = false
 local WalkSpeedActive = false
 local InfiniteJumpActive = false
 local ESPActive = false
-local FlySpeed = 70
-local MaxFlySpeed = 250 -- Aumentado!
-local WalkSpeedVal = 50
-local JumpPowerVal = 100
+local JumpPowerActive = false
+
+-- Configurações de Boost
+local WalkSpeedVal = 100 
+local JumpPowerVal = 150 
+local FlySpeed = 100
+local MaxFlySpeed = 300 
 
 -- Cores de Tema
 local ThemeColor = Color3.fromRGB(170, 85, 255)
@@ -24,14 +26,14 @@ local DarkBg = Color3.fromRGB(15, 10, 20)
 local AccentColor = Color3.fromRGB(45, 20, 70)
 local TextColor = Color3.fromRGB(230, 230, 255)
 
--- Elementos da Interface
+-- [SEGURANÇA DE CARREGAMENTO]
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "uProxyz_Ultimate"
+ScreenGui.Name = "uProxyz_UI_Final"
 local success, err = pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
 if not success then ScreenGui.Parent = Player:WaitForChild("PlayerGui") end
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- [FUNÇÕES AUXILIARES]
+-- [FUNÇÕES DE DESIGN]
 local function ApplyTween(obj, properties, duration)
     local tweenInfo = TweenInfo.new(duration or 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     local tween = TweenService:Create(obj, tweenInfo, properties)
@@ -85,7 +87,7 @@ local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = DarkBg
-MainFrame.Size = UDim2.new(0, 230, 0, 350) -- Aumentado para novos botões
+MainFrame.Size = UDim2.new(0, 230, 0, 350)
 MainFrame.Position = UDim2.new(0.5, -115, 0.5, -175)
 MainFrame.Visible = false
 MainFrame.BorderSizePixel = 0
@@ -100,7 +102,7 @@ MakeDraggable(MainFrame)
 
 local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
-Title.Text = "uPROXYZ // OVERDRIVE"
+Title.Text = "uPROXYZ // TECH"
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.TextColor3 = ThemeColor
 Title.BackgroundTransparency = 1
@@ -129,18 +131,16 @@ local function CreateTechButton(text, pos, color)
     return btn
 end
 
--- Categorias de Botões
 local NoclipBtn = CreateTechButton("Noclip: OFF", UDim2.new(0.075, 0, 0.15, 0))
-local FlyBtn = CreateTechButton("Fly: OFF", UDim2.new(0.075, 0, 0.27, 0))
-local WalkSpeedBtn = CreateTechButton("WalkSpeed: OFF", UDim2.new(0.075, 0, 0.39, 0))
-local JumpPowerBtn = CreateTechButton("JumpPower: OFF", UDim2.new(0.075, 0, 0.51, 0))
-local InfiniteJumpBtn = CreateTechButton("Inf Jump: OFF", UDim2.new(0.075, 0, 0.63, 0))
-local ESPBtn = CreateTechButton("ESP: OFF", UDim2.new(0.075, 0, 0.75, 0))
-local TPBaseBtn = CreateTechButton("Teleport Base", UDim2.new(0.075, 0, 0.87, 0), Color3.fromRGB(0, 120, 200))
+local FlyBtn = CreateTechButton("Fly: OFF", UDim2.new(0.075, 0, 0.25, 0))
+local WalkSpeedBtn = CreateTechButton("WalkSpeed: OFF", UDim2.new(0.075, 0, 0.35, 0))
+local JumpPowerBtn = CreateTechButton("JumpPower: OFF", UDim2.new(0.075, 0, 0.45, 0))
+local InfiniteJumpBtn = CreateTechButton("Inf Jump: OFF", UDim2.new(0.075, 0, 0.55, 0))
+local ESPBtn = CreateTechButton("ESP: OFF", UDim2.new(0.075, 0, 0.65, 0))
+local TPBaseBtn = CreateTechButton("Teleport Base", UDim2.new(0.075, 0, 0.77, 0), Color3.fromRGB(0, 120, 200))
+local SelfDestructBtn = CreateTechButton("Shutdown", UDim2.new(0.075, 0, 0.88, 0), Color3.fromRGB(100, 0, 0))
 
--- [LÓGICA DE FUNCIONAMENTO]
-
--- Injeção
+-- [LÓGICA DE INJEÇÃO]
 InjectBtn.MouseButton1Click:Connect(function()
     InjectBtn.Text = "LOADING..."
     task.wait(1)
@@ -150,14 +150,13 @@ InjectBtn.MouseButton1Click:Connect(function()
     ApplyTween(MainFrame, {Size = UDim2.new(0, 230, 0, 350)}, 0.5)
 end)
 
--- Noclip
+-- [LÓGICA DE FUNÇÕES]
 NoclipBtn.MouseButton1Click:Connect(function()
     NoclipActive = not NoclipActive
     NoclipBtn.Text = NoclipActive and "Noclip: ON" or "Noclip: OFF"
     NoclipBtn.TextColor3 = NoclipActive and ThemeColor or TextColor
 end)
 
--- Fly
 FlyBtn.MouseButton1Click:Connect(function()
     FlyActive = not FlyActive
     FlyBtn.Text = FlyActive and "Fly: ON" or "Fly: OFF"
@@ -184,28 +183,24 @@ FlyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- WalkSpeed
 WalkSpeedBtn.MouseButton1Click:Connect(function()
     WalkSpeedActive = not WalkSpeedActive
     WalkSpeedBtn.Text = WalkSpeedActive and "WalkSpeed: ON" or "WalkSpeed: OFF"
     WalkSpeedBtn.TextColor3 = WalkSpeedActive and ThemeColor or TextColor
 end)
 
--- JumpPower
 JumpPowerBtn.MouseButton1Click:Connect(function()
     JumpPowerActive = not JumpPowerActive
     JumpPowerBtn.Text = JumpPowerActive and "JumpPower: ON" or "JumpPower: OFF"
     JumpPowerBtn.TextColor3 = JumpPowerActive and ThemeColor or TextColor
 end)
 
--- Infinite Jump
 InfiniteJumpBtn.MouseButton1Click:Connect(function()
     InfiniteJumpActive = not InfiniteJumpActive
     InfiniteJumpBtn.Text = InfiniteJumpActive and "Inf Jump: ON" or "Inf Jump: OFF"
     InfiniteJumpBtn.TextColor3 = InfiniteJumpActive and ThemeColor or TextColor
 end)
 
--- ESP (Wallhack Básico)
 ESPBtn.MouseButton1Click:Connect(function()
     ESPActive = not ESPActive
     ESPBtn.Text = ESPActive and "ESP: ON" or "ESP: OFF"
@@ -214,28 +209,11 @@ end)
 
 -- [LOOPS DE SISTEMA]
 
--- Noclip e WalkSpeed Loop
+-- Noclip, WalkSpeed, JumpPower Loop
 RunService.Stepped:Connect(function()
-    if Player.Character then
-        local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
-        if Hum then
-            if WalkSpeedActive then
-                Hum.WalkSpeed = WalkSpeedVal
-            else
-                Hum.WalkSpeed = 16 -- Default
-            end
-            
-            if JumpPowerActive then
-                Hum.JumpPower = JumpPowerVal
-            else
-                Hum.JumpPower = 50 -- Default
-            end
-        end
-        
-        if NoclipActive then
-            for _, part in pairs(Player.Character:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = false end
-            end
+    if NoclipActive and Player.Character then
+        for _, part in pairs(Player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
         end
     end
 end)
@@ -268,13 +246,12 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
--- ESP Loop (Simples)
+-- ESP Loop
 RunService.Heartbeat:Connect(function()
     if ESPActive then
         for _, p in pairs(game.Players:GetPlayers()) do
             if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                local hrp = p.Character.HumanoidRootPart
-                if not hrp:FindFirstChild("uProxyzESP") then
+                if not p.Character:FindFirstChild("uProxyzESP") then
                     local highlight = Instance.new("Highlight")
                     highlight.Name = "uProxyzESP"
                     highlight.FillColor = ThemeColor
@@ -302,7 +279,6 @@ TPBaseBtn.MouseButton1Click:Connect(function()
         local SpawnLoc = workspace:FindFirstChildOfClass("SpawnLocation")
         if SpawnLoc then TargetPos = SpawnLoc.Position + Vector3.new(0, 5, 0) else TargetPos = Vector3.new(0, 50, 0) end
         
-        -- Blink TP
         local MaxDistance = 25
         local Steps = (Root.Position - TargetPos).Magnitude / MaxDistance
         for i = 1, math.ceil(Steps) do
@@ -316,7 +292,42 @@ TPBaseBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Self Destruct
+-- [SELF DESTRUCT - LIMPEZA PROFUNDA]
 SelfDestructBtn.MouseButton1Click:Connect(function()
+    -- 1. Desativa todas as variáveis para parar os loops
+    NoclipActive = false
+    FlyActive = false
+    WalkSpeedActive = false
+    InfiniteJumpActive = false
+    ESPActive = false
+    JumpPowerActive = false
+    
+    -- 2. Destrói a Interface (GUI)
     ScreenGui:Destroy()
+    
+    -- 3. Limpa o Personagem (Remove BodyVelocity, BodyGyro, etc)
+    if Player.Character then
+        local Root = Player.Character:FindFirstChild("HumanoidRootPart")
+        if Root then
+            if Root:FindFirstChild("FlyVelocity") then Root.FlyVelocity:Destroy() end
+            if Root:FindFirstChild("FlyGyro") then Root.FlyGyro:Destroy() end
+        end
+        
+        local Hum = Player.Character:FindFirstChildOfClass("Humanoid")
+        if Hum then
+            Hum.WalkSpeed = 16 -- Reseta para o padrão
+            Hum.JumpPower = 50 -- Reseta para o padrão
+        end
+    end
+    
+    -- 4. Limpa o ESP de todos os outros jogadores
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p.Character then
+            local esp = p.Character:FindFirstChild("uProxyzESP")
+            if esp then esp:Destroy() end
+        end
+    end
+    
+    -- 5. Finalização do Script
+    print("uProxyz: [SYSTEM SHUTDOWN] - All traces removed.")
 end)
